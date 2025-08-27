@@ -1,14 +1,34 @@
 import { StatusBar } from "expo-status-bar";
 import {
+  Alert,
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState } from "react";
 
 export default function App() {
+  const [tasks, setTasks] = useState([]); //Estado para armazenar a lista de tarefas
+  const [newTask, setNewTask] = useState(""); //Estado para a nova tarefa
+
+  const addTask = () => {
+    if (newTask.trim().length > 0) {//Garante que a tarefa não seja vazia
+      setTasks((prevTasks) => [
+        ...prevTasks,
+        { id: Date.now().toString(), text: newTask.trim(), completed: false }, //Cria uma nova tarefa com id único
+      ]);
+      setNewTask(""); //Limpar o campo de input
+      Keyboard.dismiss(); //Fecha o teclado do usuário
+    } else {
+      Alert.alert("Atenção", "Por favor, digite uma tarefa.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/*Cabeçalho*/}
@@ -24,8 +44,11 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Adicionar nova tarefa..."
+          value={newTask}
+          onChangeText={setNewTask} //Cada vez q digitar uma letra, vai adicionando e vai jogando dentro de um aray
+          onSubmitEditing={addTask} //Adiciona tarefa ao pressionar Enter no teclado e vai chamar a funçao addTask q faz fechar o teclado ou aparecer alerta
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={addTask}>
           <Text style={styles.buttonText}>Adicionar</Text>
         </TouchableOpacity>
       </View>
@@ -33,6 +56,16 @@ export default function App() {
       {/*Lista de tarefas do usuário*/}
       <FlatList
         style={styles.flatList}
+        data={tasks} //tudo que ele tem lá dentro vai tranformar em dado
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View key={item.id} style={styles.taskItem}>
+            <Text>{item.text}</Text>
+            <TouchableOpacity>
+              <Text>🗑️</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
             Nenhuma tarefa adicionada ainda.
@@ -127,7 +160,7 @@ const styles = StyleSheet.create({
   taskText: {
     color: "#333",
     fontSize: 18,
-    flexWrap: "wrap",//Permite que o texto quebre linha
+    flexWrap: "wrap", //Permite que o texto quebre linha
   },
   completedTextItem: {
     textDecorationLine: "line-through",
@@ -139,7 +172,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     // color: "#fff",
-    fontSize: 22, 
+    fontSize: 22,
     fontWeight: "bold",
   },
   emptyListText: {
