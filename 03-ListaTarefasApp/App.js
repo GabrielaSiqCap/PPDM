@@ -10,14 +10,38 @@ import {
   View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App() {
   const [tasks, setTasks] = useState([]); //Estado para armazenar a lista de tarefas
   const [newTask, setNewTask] = useState(""); //Estado para a nova tarefa
 
+  useEffect(() => {
+  const loadTasks = async () => {
+    try{
+      const savedTasks = await AsyncStorage.getItem("tasks");
+      savedTasks && setTasks(JSON.parse(savedTasks));
+  }catch(error){
+    console.log("Erro ao carregar tarefas:", error);
+  }
+};
+loadTasks();
+}, []);
+
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+      await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
+      } catch (error) {
+        console.error("Erro ao salvar as tarefas:", error);
+      }
+    };
+    saveTasks();
+  }, [tasks]);
+
   const addTask = () => {
-    if (newTask.trim().length > 0) {//Garante que a tarefa não seja vazia
+    if (newTask.trim().length > 0) {
+      //Garante que a tarefa não seja vazia
       setTasks((prevTasks) => [
         ...prevTasks,
         { id: Date.now().toString(), text: newTask.trim(), completed: false }, //Cria uma nova tarefa com id único
@@ -28,6 +52,49 @@ export default function App() {
       Alert.alert("Atenção", "Por favor, digite uma tarefa.");
     }
   };
+
+  const toggleTaskCompleted = (id) => {
+    setTasks.map((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    Alert.alert(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir essa tarefa?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () =>
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)),
+        },
+      ]
+    );
+  };
+
+  const renderList = ({ item }) => (
+    <View style={styles.taskItem} key={item.id}>
+      <TouchableOpacity
+        onPress={() => toggleTaskCompleted(item.id)}
+        style={styles.taskTextContainer}
+      >
+        <Text
+          style={[styles.taskText, item.completed && styles.completedTextItem]}
+        >
+          {item.text}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => deleteTask(item.id)}>
+        <Text>🗑️</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -58,14 +125,15 @@ export default function App() {
         style={styles.flatList}
         data={tasks} //tudo que ele tem lá dentro vai tranformar em dado
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View key={item.id} style={styles.taskItem}>
-            <Text>{item.text}</Text>
-            <TouchableOpacity>
-              <Text>🗑️</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        renderItem={renderList}
+        // renderItem={({ item }) => (
+        //   <View key={item.id} style={styles.taskItem}>
+        //     <Text>{item.text}</Text>
+        //     <TouchableOpacity>
+        //       <Text>🗑️</Text>
+        //     </TouchableOpacity>
+        //   </View>
+        // )}
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
             Nenhuma tarefa adicionada ainda.
