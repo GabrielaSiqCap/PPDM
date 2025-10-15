@@ -14,11 +14,11 @@ export default function HomeScreen() {
 
         <Text style={[styles.textToggle, styles.mb1]}>Página Inicial</Text>
 
-        <TouchableOpacity onPress={toggleTheme} style={[styles.bgPrimary, styles.px2, styles.py1, styles.rounded1]}>
-          <Text style={[styles.textLight]}>Troca Tema</Text>
+        <TouchableOpacity onPress={toggleTheme} style={[styles.bgPrimary, styles.px1, styles.py1, styles.roundedCircle]}>
+          <Text style={[styles.textLight]}></Text>
+        {isDark ? <Ionicons name="sunny" size={24} color="white" ></Ionicons>:<Ionicons name="moon" size={24} color="white" ></Ionicons>}
         </TouchableOpacity>
 
-        {isDark ? <Ionicons name="sunny" size={24} color="white" ></Ionicons>:<Ionicons name="moon" size={24} color="white" ></Ionicons>}
 
           <Text style={[styles.mt2, styles.text]}>Meu estilo próprio</Text>
 
