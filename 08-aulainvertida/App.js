@@ -15,7 +15,7 @@ export default function App() {
     <Buildstrap customThemes={{dark, light}} >
       <NavigationContainer>
         <Tab.Navigator screenOptions={{headerShown: false}}>
-          <Tab.Screen name='Home' component={HomeScreen} />
+          <Tab.Screen name='Home' component={HomeScreen} icon="🏠"/>
           <Tab.Screen name='Sensor' component={SensorDHTScreen} />
         </Tab.Navigator>
       </NavigationContainer>

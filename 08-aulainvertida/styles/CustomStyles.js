@@ -5,7 +5,7 @@ export function customStyles() {
         text: {
             fontSize: 20, 
             fontWeight: "bold", 
-            color: "green"
+            color: "#5682B1",
               },
     }
     return StyleSheet.create(body);
