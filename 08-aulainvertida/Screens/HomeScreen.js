@@ -15,7 +15,6 @@ export default function HomeScreen() {
         <Text style={[styles.textToggle, styles.mb1]}>Página Inicial</Text>
 
         <TouchableOpacity onPress={toggleTheme} style={[styles.bgPrimary, styles.px1, styles.py1, styles.roundedCircle]}>
-          <Text style={[styles.textLight]}></Text>
         {isDark ? <Ionicons name="sunny" size={24} color="white" ></Ionicons>:<Ionicons name="moon" size={24} color="white" ></Ionicons>}
         </TouchableOpacity>
 
